@@ -1,5 +1,54 @@
 ---
 title: "week1-lab"
 format: html
+author: "Leela Dixit"
+date: 2026-01-08
 ---
+
+Load packages
+```{r}
+library(tidyverse)
+library(janitor)
+library(here)
+```
+
+Load data
+```{r}
+stressors <- read_csv(here::here("data", "stressor.csv"))
+```
+
+Fix character issues
+```{r}
+clean_stressor <- stressors %>% 
+  mutate(state = str_replace_all(state, "[^A-Za-z]", ""),
+         stressor = str_replace_all(stressor, "[^A-Za-z]", ""),
+         stressor = str_replace_all(stressor, "Disesases", "Diseases")) %>% 
+  clean_names() %>% 
+  pivot_longer(cols = "january_march":"october_december",
+               names_to = "months",
+               values_to = "percent") %>% 
+  mutate(quarter = case_when(months == "january_march" ~ 1,
+                             months == "april_june" ~ 2,
+                             months == "july_september" ~ 3,
+                             months == "october_december" ~ 4)) %>% 
+  filter(state != "UnitedStates",
+         state != "OtherStates")
+```
+
+filter for which stressor and state we want
+```{r}
+exp_stressor <- clean_stressor %>% 
+  filter(state == "NewMexico",
+         stressor == "Varroamites") %>% 
+  drop_na() %>% 
+  group_by(year, quarter) %>% 
+  summarise(avg = mean(percent))
+
+```
+
+visualize!
+```{r}
+ggplot(exp_stressor, aes(x = year, y = avg, fill = quarter)) +
+  geom_col(position = position_dodge2(preserve = "single"))
+```
 
