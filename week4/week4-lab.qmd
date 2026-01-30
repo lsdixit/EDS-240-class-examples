@@ -1,0 +1,59 @@
+---
+title: "week4-lab"
+format: html
+---
+
+```{r}
+library(tidyverse)
+library(here)
+library(ggdensity)
+library(ggridges)
+```
+
+
+```{r}
+url <- "https://github.com/EDS-240-Data-Viz/fundamental-charts-lab-data/blob/main/palm_trees/palmtrees.csv"
+data <- read_csv(here("data", "palmtrees.csv"))
+```
+```{r}
+ggplot(data, aes(x = max_stem_height_m, y = palm_subfamily)) +
+  geom_density_ridges()
+
+ggplot(data, aes(x = max_stem_height_m, y = palm_subfamily)) +
+  geom_boxplot()
+
+# ggplot(data, aes(x = conspicuousness, y = max_leaf_number)) +
+#   geom_boxplot()
+
+ggplot(data, aes(x = palm_subfamily, y = fruit_size_categorical)) +
+  geom_col()
+
+unique(data$main_fruit_colors)
+
+data %>% 
+  group_by(palm_subfamily, climbing) %>% 
+  summarise(climb = n())
+
+ggplot(data, aes(x = fruit_shape, y = average_fruit_width_cm)) +
+  geom_jitter()
+
+data %>% 
+  filter(palm_subfamily != "Nypoideae") %>% 
+  ggplot(aes(x = average_fruit_length_cm, y = average_fruit_width_cm)) +
+    geom_point(alpha = 0.5) +
+    geom_smooth(method = "lm", se = FALSE, color = "firebrick") +
+    theme_minimal() +
+    facet_wrap(~palm_subfamily) +
+  labs(title = "Length-Weight Relationship for Palm Tree Fruits",
+       subtitle = "By subfamily",
+       y = "Fruit Width (cm)",
+       x = "Fruit Length (cm)",
+       caption = "Data Source: PalmTraits 1.0 Database") +
+  scale_x_continuous(limits = c(0,30)) +
+  theme(plot.margin = unit(c(1,1,1,1), "cm"))
+```
+
+```{r}
+
+```
+
